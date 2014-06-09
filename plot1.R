@@ -1,3 +1,4 @@
+##plot1
 ## Read data from file:
 hpc <- read.csv("~/household_power_consumption.txt", sep=";")
 ## Subset required data (only two dates):
