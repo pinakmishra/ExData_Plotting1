@@ -1,41 +1,31 @@
-#plot4
-#histogram on the Global active power
-hpc <- read.csv("household_power_consumption.txt", sep=";")
+##plot 4
+# Read file into memory
+# source file must be in working directory or accessible
+# this code asume source file is in working directory
+data1 <- read.table("household_power_consumption.txt", sep = ";", na.strings = "?", as.is = 1:2,header = TRUE)
+# subset the data for february 1st and 2nd only
+data.feb <- data1[data1$Date == "2/2/2007" | data1$Date == "1/2/2007",]
+# combine date and time
+data.feb$DateTime <- paste(data.feb$Date,data.feb$Time)
+# put date and time in the correct format
+data.feb$DateTime <- strptime(data.feb$DateTime, format = "%d/%m/%Y %H:%M:%S")
+# plot 4
+png("plot4.png")
+n.col <- 2
+n.row <- 2
+par(mfrow = c(n.col,n.row))
+# plot 4-1
+plot(data.feb$DateTime, data.feb$Global_active_power, type ="l", ylab = "Global Active Power {kilowatts}", xlab="")
 
-#converts the date formating to dd/mm/yyy
-hpc$Date <- as.Date(hpc$Date , "%d/%m/%Y")
+# plot 4-2
+plot(data.feb$DateTime, data.feb$Voltage, type ="l", ylab = "Voltage", xlab="datetime")
 
-#get the global active power column as numeric for histogram
-hpc$Global_active_power <- as.numeric(hpc$Global_active_power)
+# plot 4-3
+plot(data.feb$DateTime, data.feb$Sub_metering_1, type ="l", ylab = "Energy Sub Metering", xlab = "")
+lines(data.feb$DateTime, data.feb$Sub_metering_2, col="red")
+lines(data.feb$DateTime, data.feb$Sub_metering_3, col="blue")
+legend("topright", c("sub_metering_1", "sub_metering_2", "sub_metering_3"), lty=c(1,1,1), col=c("black", "red","blue"))
 
-#filter the date with the given value
-f_hpc <- hpc[hpc$Date == "2007-02-01" | hpc$Date == "2007-02-02" | hpc$Date == "2007-02-03" ,]
-
-#filter global active power
-#gap <-  f_hpc$Global_active_power
-
-#plot histogram
-par(mfrow = c(2,2))
-
-with(f_hpc , {
-    
-    #1st
-    plot(Date , Global_active_power , ylab = "Global Active Power (kilowatts)")
-  
-    #2nd
-    plot(Date ,Voltage , xlab = "Date" , ylab = "Voltage")
-    
-    #4th
-    plot(Date ,Global_reactive_power , xlab = "Date" ,ylab = "Global_reactive_power")
-    
-    
-   #3rd
-    with(f_hpc , plot( f_hpc$Date , f_hpc$Sub_metering_1 , col = "black" , ylab = "Energy sub metering" ))
-    with(f_hpc , plot( f_hpc$Date , f_hpc$Sub_metering_2 , col = "red"  ,  ylab = "Energy sub metering" ))
-    with(f_hpc , plot( f_hpc$Date , f_hpc$Sub_metering_3 , col = "blue" ,  ylab = "Energy sub metering" ))
-    legend("topright" , legend = c("Sub_metering_1" , "Sub_metering_2" , "Sub_metering_3") , bty = "n" , lwd = 2 ,  col = c("black" , "red" , "blue") , lty = c(1,1,1) , pch = c(NA,NA,NA))
-      
-})
-
-dev.copy(png , "plot4.png")
+# plot 4-4
+plot(data.feb$DateTime, data.feb$Global_reactive_power, type ="l", ylab = names(data.feb[4]), xlab="datetime")
 dev.off()
